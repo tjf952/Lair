@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hacker Terminal</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospaace;
+      background-color: black;
+      color: green;
+      margin: 0;
+      padding: 20px;
+    }
+    #terminal {
+      white-space: pre-wrap;
+      font-size: 16px;
+      height: 80vh;
+      overflow-y: auto;
+      border: 2px solid green;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    #terminal::-webkit-scrollbar {
+      width:0;
+    }
+    #terminal {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      background-color: black;
+      color: green;
+    }
+    input[type="text"]::placeholder {
+      color: green;
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% {
+        color: transparent;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal">
+    Welcome to the Hacker Terminal v1.0
+    Type 'help' to see the list of commands.
+  </div>
+  <input type="text" id="commandInput" placeholder="    Enter command here..." onkeydown="handleCommand(event)">
+  <script>
+    const terminal = document.getElementById('terminal');
+    const commandInput = document.getElementById("commandInput");
+
+    const commands = {
+      "help": "Available commands:\nls - Lists current directory\ncat [file] - Prints file contents\nstory - Prints the story of Thomas and Kathryn\n\t[-x] True story",
+      "ls": "wedding_info.txt\nwedding_location.txt\ngroom.txt\nbride.txt",
+      "cat": function (arg) {
+        switch (arg) {
+          case "wedding_info.txt":
+            return "Please go to the following url, <https://www.zola.com/wedding/thomasandkathryn2025> for all details. The password is <REDACTED>. Ask Thomas.";
+          case "wedding_location.txt":
+            return "<REDACTED>";
+          case "groom.txt":
+            return "Thomas, the Man, the Myth, the Legend.";
+          case "bride.txt":
+            return "Kathryn (last name TBD)";
+          default:
+            return "File not found.";
+        }
+      },
+      "story": async function (arg) {
+        if (arg === "-x") {
+          const response = await fetch('secret_resources/secret_story.txt');
+          if (response.ok) {
+            return await response.text();
+          } else {
+            return "Error loading story.";
+          }
+        }
+        const response = await fetch('secret_resources/story.txt');
+        if (response.ok) {
+          return await response.text();
+        } else {
+          return "Error loading secret story.";
+        }
+      },
+      "puzzl3": function() {
+        window.location.href = "puzzl3.html";
+      },
+      "unl0ck_th3_s3cr3t": function() {
+        window.location.href = "th3_s3cr3t.html"
+      },
+    };
+
+    async function handleCommand(event) {
+      if (event.key === 'Enter') {
+        const input = commandInput.value.trim();
+        const [cmd, ...args] = input.split(" ");
+        const arg = args.join(" ");
+        let output = "Command Not Found. Try Again.";
+
+        if (commands[cmd]) {
+          if (typeof commands[cmd] === "function") {
+            output = await commands[cmd](arg);
+          } else {
+            output = commands[cmd];
+          }
+        }
+
+        terminal.textContent += `\n> ${input}\n${output}\n`;
+        terminal.scrollTop = terminal.scrollHeight;
+        commandInput.value = "";
+      }
+    }
+
+    function appendToTerminal(text) {
+      terminal.innerHTML += "\n" + text;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  </script>
+</body>
+</html>

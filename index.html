@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Portal</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: black;
+      color: green;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      margin-top: 20%;
+      z-index: 2;
+      position: relative;
+    }
+
+    input[type="password"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid green;
+      background-color: black;
+      color: green;
+      outline: none;
+    }
+
+    input[type="password"]:focus::placeholder {
+      color: transparent;
+    }
+
+    input[type="password"]::placeholder {
+      color: green;
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        color: transparent;
+      }
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: 2px solid green;
+      background-color: black;
+      color: green;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: green;
+      color: black;
+    }
+
+    button:disabled {
+      background-color: darkgreen;
+      color: gray;
+      cursor: not-allowed;
+    }
+
+    #errorMessage {
+      color: red;
+      margin-top: 10px;
+      height: 20px;
+    }
+
+    /* Broken Screen Effect */
+    .broken {
+      filter: grayscale(100%) brightness(0.5);
+      animation: crackEffect 5s linear forwards;
+    }
+
+    @keyframes crackEffect {
+      0% {
+        transform: scale(1) rotate(0);
+      }
+      100% {
+        transform: scale(1.05) rotate(-0.5deg);
+      }
+    }
+
+    .crack-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      background: url('https://i.imgur.com/9dHF6iK.png') no-repeat center/cover;
+      opacity: 0;
+      transition: opacity 5s ease;
+    }
+
+    .censored {
+      color: black;
+      background-color: green;
+      display: inline-block;
+      padding: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="crack-overlay"></div>
+  <div class="container">
+    <h1 id="title">Welcome to the Access Portal</h1>
+    <p id="description">Enter the password to proceed:</p>
+    <input type="password" id="passwordInput" placeholder="Enter Password">
+    <button id="submitButton" onclick="checkPassword()">Submit</button>
+    <div id="errorMessage"></div>
+  </div>
+
+  <script>
+    // YAY, it seems like you finally decided to look here. I'm proud of you! :)
+    const correctPassword = "f1nnt@st1cw3dd1ng";
+    let failedAttempts = 0;
+
+    const errorMessages = [
+      "Access Denied. Try Again.",
+      "Incorrect Password. Are you sure you belong here?",
+      "Authorization Failure. System Alert Logged.",
+      "Error 403: Forbidden. This incident will be reported.",
+      "Critical Failure. Security protocols activated."
+    ];
+
+    function checkPassword() {
+      const input = document.getElementById("passwordInput");
+      const submitButton = document.getElementById("submitButton");
+      const errorMessage = document.getElementById("errorMessage");
+
+      if (input.value === correctPassword) {
+        window.location.href = "terminal.html"; // Redirect on success
+      } else {
+        failedAttempts++;
+        if (failedAttempts <= 5) {
+          errorMessage.textContent = errorMessages[failedAttempts - 1];
+        }
+        if (failedAttempts === 5) {
+          makeScreenBroken();
+          // Disable input and button
+          input.disabled = true;
+          submitButton.disabled = true;
+        }
+        input.value = "";
+      }
+    }
+
+    function makeScreenBroken() {
+      const body = document.body;
+      const crackOverlay = document.querySelector('.crack-overlay');
+      const errorMessage = document.getElementById("errorMessage");
+      const title = document.getElementById("title");
+      const description = document.getElementById("description");
+
+      errorMessage.textContent = "System Overload. Critical Failure Detected.";
+      description.textContent = "\nASK THE INSPECTOR AND LOOK AT HIS SOURCES???"
+      body.classList.add("broken");
+      crackOverlay.style.opacity = 1;
+
+      // Start censoring words
+      let words = title.textContent.split(" ");
+      title.textContent = ""; // Clear text
+      words.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.textContent = word + " ";
+        title.appendChild(span);
+
+        // Gradually censor each word
+        setTimeout(() => {
+          span.classList.add("censored");
+        }, index * 500);
+      });
+
+      let descWords = description.textContent.split(" ");
+      description.textContent = ""; // Clear text
+      descWords.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.textContent = word + " ";
+        description.appendChild(span);
+
+        // Gradually censor each word
+        setTimeout(() => {
+          span.classList.add("censored");
+        }, index * 500);
+      });
+    }
+  </script>
+</body>
+</html>
